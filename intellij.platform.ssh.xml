@@ -1,0 +1,121 @@
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
+  <module value="com.intellij.modules.ssh"/>
+
+  <extensionPoints>
+    <extensionPoint
+      interface="com.intellij.ssh.config.SshConnectionConfigService$Modifier"
+      qualifiedName="com.intellij.ssh.config.sshConnectionConfigService.modifier"
+      dynamic="true"/>
+  </extensionPoints>
+
+  <applicationListeners>
+    <listener
+      class="com.intellij.ssh.fus.SshApplicationUsagesCollector$SshConnectionListener"
+      topic="com.intellij.ssh.ui.SshConnectionStateListener"/>
+  </applicationListeners>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.intellij.ssh.SshConnectionService"/>
+    <applicationService serviceImplementation="com.intellij.ssh.config.OpenSSHConfigService"/>
+    <applicationService serviceImplementation="com.intellij.ssh.rsync.RsyncStatusService"/>
+    <applicationService serviceImplementation="com.intellij.ssh.rsync.RsyncService"/>
+
+    <applicationService serviceInterface="com.intellij.ssh.config.unified.SshConfigManager"
+                        serviceImplementation="com.intellij.ssh.config.unified.SshConfigManagerImpl$AppLevel"/>
+    <applicationService serviceInterface="com.intellij.ssh.ui.SshPasswordPrompt"
+                        serviceImplementation="com.intellij.ssh.ui.UISshPasswordPrompt"
+                        testServiceImplementation="com.intellij.ssh.ui.TestSshPasswordPrompt"/>
+    <applicationService serviceInterface="com.intellij.ssh.config.SshConnectionConfigService$Delegate"
+                        serviceImplementation="com.intellij.ssh.config.ProductionSshConnectionConfigDelegate"
+                        testServiceImplementation="com.intellij.ssh.config.TestSshConnectionConfigDelegate"/>
+    <projectService serviceInterface="com.intellij.ssh.config.unified.SshConfigManager"
+                    serviceImplementation="com.intellij.ssh.config.unified.SshConfigManagerImpl$ProjectLevel"/>
+    <applicationService serviceImplementation="com.intellij.ssh.config.unified.SshConfigManagerBase$App"/>
+    <projectService serviceImplementation="com.intellij.ssh.config.unified.SshConfigManagerBase$Project"/>
+
+    <serviceViewContributor implementation="com.intellij.ssh.services.SshServiceViewContributor"/>
+
+    <registryKey key="ide.service.view.show.ssh.connections"
+                 description="Show SSH connections in Services tool window."
+                 defaultValue="false"
+                 restartRequired="true"/>
+
+    <registryKey key="ide.show.ssh.auth.prompt"
+                 description="Show password and passphrase prompt if the user has not specified them in SSH configuration"
+                 defaultValue="true"
+                 restartRequired="false"/>
+
+    <registryKey defaultValue="true"
+                 description="Experimental support for X11 forwarding"
+                 key="ssh.x11.forwarding"
+                 restartRequired="true"/>
+
+    <registryKey defaultValue="true"
+                 description="Experimental support for SSH agent forwarding"
+                 key="ssh.agent.forwarding"
+                 restartRequired="true"/>
+
+    <registryKey defaultValue="true"
+                 description="Experimental support for SSH connections through proxy"
+                 key="ssh.over.proxy"
+                 restartRequired="false"/>
+
+    <registryKey defaultValue="true"
+                 description="Support for OpenSSH agent for Windows"
+                 key="openssh.agent.windows"
+                 restartRequired="false"/>
+
+    <registryKey defaultValue="true"
+                 description="SSH: Use an experimental algorithm for obtaining Kerberos credentials"
+                 key="ssh.kerberos.use.default.credential"
+                 restartRequired="false"/>
+
+    <registryKey defaultValue="2"
+                 description="The timeout in seconds for loading OpenSSH config"
+                 key="ssh.openssh.config.load.timeout.seconds"/>
+
+    <projectConfigurable groupId="tools" groupWeight="120" instance="com.intellij.ssh.ui.unified.SshConfigConfigurable$Main"
+                         id="ssh.settings" key="ssh.configurable.title" bundle="messages.SshBundle"/>
+
+    <applicationConfigurable groupId="tools"
+                             bundle="messages.SshBundle"
+                             key="configurable.RsyncConfigurable.display.name"
+                             id="rsyncConfigurable" instance="com.intellij.ssh.rsync.RsyncConfigurable"/>
+
+    <notificationGroup id="Remote Transfer" displayType="NONE" bundle="messages.SshBundle" key="notification.group.name"/>
+    <notificationGroup id="SSH Connections" displayType="BALLOON" bundle="messages.SshBundle"
+                       key="ssh.connections.notifications.group.title"/>
+
+    <applicationService serviceInterface="com.intellij.ssh.ui.SshUiService"
+                        serviceImplementation="com.intellij.ssh.ui.SshUiServiceImpl"/>
+
+    <applicationService serviceInterface="com.intellij.ssh.config.SshIdeGlobalProxyGetter"
+                        serviceImplementation="com.intellij.ssh.config.SshIdeGlobalProxyGetter$Default"/>
+
+    <applicationService serviceInterface="com.intellij.ssh.ui.SshUiExtensions"
+                        serviceImplementation="com.intellij.ssh.ui.DefaultSshUiExtensions"/>
+
+    <applicationService serviceImplementation="com.intellij.ssh.config.SshConnectionConfigService"/>
+
+    <statistics.applicationUsagesCollector implementation="com.intellij.ssh.fus.SshApplicationUsagesCollector"/>
+    <advancedSetting
+      bundle="messages.SshBundle"
+      groupKey="advanced.setting.ssh.group"
+      id="ssh.config.backend"
+      default="OPENSSH"
+      enumClass="com.intellij.ssh.config.SshConnectionConfigService$Kind"
+    />
+    <advancedSetting
+      bundle="messages.SshBundle"
+      groupKey="advanced.setting.ssh.group"
+      id="ssh.tool.custom.path"
+      default="ssh"
+    />
+  </extensions>
+
+  <xi:include href="intellij.platform.ssh.ui.xml">
+    <!-- Allows to load some extensions which are available in products with UI (like all IDEs),
+     and ignore them in products without UI (like cwm-gateway). -->
+    <xi:fallback/>
+  </xi:include>
+</idea-plugin>

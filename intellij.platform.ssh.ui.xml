@@ -1,0 +1,12 @@
+<idea-plugin>
+  <extensionPoints>
+    <extensionPoint name="sshConnectionConfigFormExtension" interface="com.intellij.ssh.ui.SshConnectionConfigFormExtension" dynamic="true"/>
+  </extensionPoints>
+  <module value="com.intellij.modules.ssh.ui"/>
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceInterface="com.intellij.ssh.config.SshIdeGlobalProxyGetter"
+                        serviceImplementation="com.intellij.ssh.config.HttpConfigurableSshProxyGetter"
+                        overrides="true"/>
+    <troubleInfoCollector implementation="com.intellij.ssh.rsync.RsyncTroubleInfoCollector"/>
+  </extensions>
+</idea-plugin>
